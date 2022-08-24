@@ -14,8 +14,8 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Atom Dealer
- * Plugin URI:        https://www.nirmal.com.au/
- * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
+ * Plugin URI:        
+ * Description:       Wordpress plugin for custom tables and setting pages. It's displayed in the WordPress admin area.
  * Version:           1.0.0
  * Author:            NWS
  * Author URI:        NWS
