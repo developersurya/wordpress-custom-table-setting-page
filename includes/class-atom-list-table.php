@@ -38,6 +38,15 @@ class Atom_List_Table {
 	 */
 	protected $_pagination_args = array();
 
+
+    /**
+	 * List heading displaying .
+	 *
+	 * @since 1.0
+	 * @var array
+	 */
+	protected $table_view_options  = array();
+
     public function __construct( $args = array() ) {
 		$args = wp_parse_args(
 			$args,
@@ -56,12 +65,12 @@ class Atom_List_Table {
      *
      * @return void
      */
-    public function get_main_model()
-	{
-		$table    = new Dealer_Query('main_model');
-		$all_rows = $table->get_all();
-		return $all_rows;
-	}
+    // public function get_main_model()
+	// {
+	// 	$table    = new Dealer_Query('main_model');
+	// 	$all_rows = $table->get_all();
+	// 	return $all_rows;
+	// }
 
 
 
@@ -77,131 +86,54 @@ class Atom_List_Table {
 	}
 
 
-    public function list_table_header() {
-        return '<thead>
-        <tr>
-            <td id="cb" class="manage-column column-cb check-column">
-                <label class="screen-reader-text" for="cb-select-all-1">Select All</label>
-                <input id="cb-select-all-1" type="checkbox">
-            </td>
-            <th scope="col" id="title" class="manage-column column-title column-primary sortable desc">
-                <span>Model number </span>
-                <span class="sorting-indicator"></span>
-            </th>
-            <th scope="col" id="author" class="manage-column column-author">Author</th>
-            <th scope="col" id="categories" class="manage-column column-categories">Categories</th>
-            <th scope="col" id="tags" class="manage-column column-tags">Tags</th>
-            <th scope="col" id="comments" class="manage-column column-comments num sortable desc">
-                <span>
-                    <span class="vers comment-grey-bubble" title="Comments">
-                        <span class="screen-reader-text">Comments</span>
-                    </span>
-                </span>
-            </th>
-            <th scope="col" id="date" class="manage-column column-date sortable asc">
-                <a href="javascript:void(0)">
-                    <span>Date</span><span class="sorting-indicator"></span>
-                </a>
-            </th>
-        </tr>
-    </thead>';
+    public function list_table_header( $table_view_options  ) {
+        $head =  '<thead><tr>';
+        if( is_array( $table_view_options ) && !empty( $table_view_options ) ) {
+            foreach ( $table_view_options as $table_view ) {
+                $head .= '<th scope="col" id="'.$table_view.'" class="manage-column column-'.$table_view.'">'.ucfirst( str_replace ('_',' ', $table_view ) ) .'</th>';
+            }
+        }
+    
+        $head .= '</tr></thead>';
+        return $head;
     }
 
 
-    public function list_table_footer(){
-        return '<tfoot>
-        <tr>
-            <td class="manage-column column-cb check-column">
-                <label class="screen-reader-text" for="cb-select-all-2">Select All</label>
-                <input id="cb-select-all-2" type="checkbox">
-            </td>
-            <th scope="col" class="manage-column column-title column-primary sortable desc">
-                <span>Title</span>
-            </th>
-            <th scope="col" class="manage-column column-author">Author</th>
-            <th scope="col" class="manage-column column-categories">Categories</th>
-            <th scope="col" class="manage-column column-tags">Tags</th>
-            <th scope="col" class="manage-column column-comments num sortable desc">
-                <span>
-                    <span class="vers comment-grey-bubble" title="Comments">
-                        <span class="screen-reader-text">Comments</span>
-                    </span>
-                </span>
-            </th>
-            <th scope="col" class="manage-column column-date sortable asc">
-                <a href="javascript:void(0)">
-                    <span>Date</span>
-                    <span class="sorting-indicator"></span>
-                </a>
-            </th>
-        </tr>
-    </tfoot>';
+    public function list_table_footer( $table_view_options  ){
+
+        $footer =  '<tfoot><tr>';
+        if( is_array( $table_view_options ) && !empty( $table_view_options ) ) {
+            foreach ( $table_view_options as $table_view ) {
+                $footer .= '<td scope="col" id="'.$table_view.'" class="manage-column column-'.$table_view.'">'.ucfirst( str_replace ('_',' ', $table_view ) ) .'</td>';
+            }
+        }
+    
+        $footer .= '</tr></tfoot>';
+
+         return $footer ;
     }
 
 
-    public function get_list_items( $data ) {
+    public function get_list_items( $data , $table_view_options  ) {
 
+      
          if ($data) { 
 
           $body = '<tbody id="the-list">';
 
              foreach ($data as $model) { 
 
-                $body .= '<tr id="post-1" class="iedit author-self level-0 post-1 type-post status-publish format-standard hentry category-Dummy category">
-                    <th scope="row" class="check-column">
-                        <label class="screen-reader-text" for="cb-select-1">Select Post #1</label>
-                        <input id="cb-select-1" type="checkbox" name="post[]" value="1">
-                        <div class="locked-indicator">
-                            <span class="locked-indicator-icon" aria-hidden="true"></span>
-                            <span class="screen-reader-text">
-                                “Post #1” is locked
-                            </span>
-                        </div>
-                    </th>
-                    <td class="title column-title has-row-actions column-primary page-title" data-colname="Title">
-                        <div class="locked-info">
-                            <span class="locked-avatar"></span>
-                            <span class="locked-text"></span>
-                        </div>
-                        <strong>
-                            <a class="row-title" href="javascript:void(0)" aria-label="“Post #1” (Edit)">'.$model['model_number'].'</a>
-                        </strong>
-
-                        <div class="row-actions">
-                            <span class="edit"><a href="javascript:void(0)" aria-label="Edit “Post #1”">Edit</a> | </span>
-                            <span class="inline hide-if-no-js"><button type="button" class="button-link editinline" aria-label="Quick edit “Post #1” inline" aria-expanded="false">Quick Edit</button> | </span>
-                            <span class="trash"><a href="javascript:void(0)" class="submitdelete" aria-label="Move “Post #1” to the Trash">Trash</a> | </span>
-                            <span class="view"><a href="javascript:void(0)" rel="bookmark" aria-label="View “Post #1”">View</a></span>
-                        </div>
-                        <button type="button" class="toggle-row"><span class="screen-reader-text">Show more details</span></button>
-                    </td>
-                    <td class="author column-author" data-colname="Author">
-                        <a href="javascript:void(0)">dummy@emailaddress</a>
-                    </td>
-                    <td class="categories column-categories" data-colname="Categories">
-                        <a href="javascript:void(0)">Dummy category</a>
-                    </td>
-                    <td class="tags column-tags" data-colname="Tags">
-                        <span aria-hidden="true">—</span>
-                        <span class="screen-reader-text">No tags</span>
-                    </td>
-                    <td class="comments column-comments" data-colname="Comments">
-                        <div class="post-com-count-wrapper">
-                            <a href="javascript:void(0)" class="post-com-count post-com-count-approved">
-                                <span class="comment-count-approved" aria-hidden="true">1</span>
-                                <span class="screen-reader-text">1 comment</span>
-                            </a>
-                            <span class="post-com-count post-com-count-pending post-com-count-no-pending">
-                                <span class="comment-count comment-count-no-pending" aria-hidden="true">0</span>
-                                <span class="screen-reader-text">No pending comments</span></span>
-                        </div>
-                    </td>
-                    <td class="date column-date" data-colname="Date">Published<br>
-                        <abbr title="2019/08/22 9:00:46 am">2 hours ago</abbr>
-                    </td>
-                </tr>';
+                $body .= '<tr id="post-list" class="iedit author-self level-0 post-1 type-post status-publish format-standard ">';
+                
+                if( is_array( $table_view_options ) && !empty( $table_view_options ) ) {
+                    foreach ( $table_view_options as $table_view ) {
+                        //$body .= '<td class="date column-date" data-colname="Date">Published<br>
+                        $body .= '<td class="date column-date" data-colname="Date">'.$model[$table_view].'</td>';
+                    }
+                }
+                $body .= '</tr>';
              } 
-             
+
             $body .= '</tbody>';
 
             return $body;
@@ -209,12 +141,32 @@ class Atom_List_Table {
 
     }
 
+    public function get_main_model()
+	{
+
+		$table    = new Dealer_Query('main_model');
+
+        $pagenum = $this->get_pagenum();  // ?? does not work here
+
+		$total_item = $this->get_total_item_number();
+
+        $limit = 10;
+
+		$offset = ( $pagenum - 1 ) * $limit;
+        //var_dump( $pagenum , $limit , $offset );
+		$all_rows = $table->get_table_data( 'date', 'DESC', $offset, $limit  );
+		return $all_rows;
+	}
+
+
     /**
 	 * Displays the list of views available on this table.
 	 *
 	 * @since 3.1.0
 	 */
-	public function list_views( ) {
+	public function list_views( $table_view_options ) {
+
+       
 
         $data = $this->get_main_model(); 
 
@@ -226,11 +178,11 @@ class Atom_List_Table {
             
                 $views .= '<table class="wp-list-table widefat fixed striped table-view-list posts">';
 
-                $views .= $this->list_table_header();
+                $views .= $this->list_table_header( $table_view_options  );
 
-                $views .= $this->get_list_items( $data );
+                $views .= $this->get_list_items( $data, $table_view_options  );
 
-                $views .= $this->list_table_footer();
+                $views .= $this->list_table_footer( $table_view_options );
             
                 $views .= '</table></form>';
 
@@ -241,7 +193,6 @@ class Atom_List_Table {
         return $views;
 
 	}
-
 
 
     /**
@@ -265,6 +216,13 @@ class Atom_List_Table {
 		return 0;
 	}
 
+
+    public function get_total_item_number(){
+        $table    = new Dealer_Query('main_model');
+        $data = $table->get_all(); 
+        $total_items     = ( count( $data ) )? count( $data ) : 0;
+        return $total_items;
+    }
     /**
 	 * Gets the current page number.
 	 *
@@ -273,15 +231,43 @@ class Atom_List_Table {
 	 * @return int
 	 */
 	public function get_pagenum() {
-		$pagenum = isset( $_REQUEST['paged'] ) ? absint( $_REQUEST['paged'] ) : 0;
 
-		if ( isset( $this->_pagination_args['total_pages'] ) && $pagenum > $this->_pagination_args['total_pages'] ) {
-			$pagenum = $this->_pagination_args['total_pages'];
+		$pagenum = isset( $_REQUEST['pagenum'] ) ? absint( $_REQUEST['pagenum'] ) : 0;
+
+		if ( ( $this->get_total_item_number() > 0  ) && $pagenum > $total_pages ) {
+			//$pagenum = $this->total_pages;
 		}
 
 		return max( 1, $pagenum );
 	}
 
+
+    public function get_pagination_data( $total_records , $no_of_records_per_page ){
+        $total_pages = ceil($total_records / $no_of_records_per_page);
+        return $total_pages;
+    }
+
+    protected function pagination_(  ) {
+
+        $get_current_page =  $this->get_pagenum();
+        $get_total_item_number = $this->get_total_item_number();
+        $total_pages = $this->get_pagination_data( $get_total_item_number , 10 );
+
+        $page_links = paginate_links( array(
+            'base' => add_query_arg( 'pagenum', '%#%' ),
+            'format' => '',
+            'prev_text' => __( '&laquo;', 'text-domain' ),
+            'next_text' => __( '&raquo;', 'text-domain' ),
+            'total' => $total_pages,
+            'current' => $get_current_page
+        ) );
+        
+        if ( $page_links ) {
+            $pagi_html =  '<div class="tablenav bottom"><div class="tablenav-pages" style="margin: 1em 0">' . $page_links . '</div></div>'; 
+        }
+        return $pagi_html;
+
+    }
 
     
 
