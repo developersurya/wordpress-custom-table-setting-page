@@ -42,9 +42,9 @@
     public function get_all( $orderBy = NULL  , $return = NULL )
     {
         global $wpdb;
-
-        $sql = 'SELECT * FROM `'.$this->tableName.'`';
-
+       
+        $sql = 'SELECT * FROM `main_model`';
+     
         if(!empty($orderBy))
         {
             $sql .= ' ORDER BY ' . $orderBy;
@@ -62,11 +62,16 @@
 
     // [10]=> array(12) { ["model_id"]=> string(6) "758631" ["model_number"]=> string(5) "315-5" ["description"]=> string(46) "Battery Edger - kit with 5AH battery & charger" ["retail_price"]=> string(3) "829" ["image_name"]=> string(21) "315 battery edger.png" ["dealer_discount"]=> string(2) "25" ["part_collection"]=> string(1) "0" ["is_publish"]=> string(1) "0" ["date"]=> string(19) "2022-02-23 08:17:04" ["is_deactive"]=> string(1) "0" ["no_longer_available"]=> string(1) "0" ["substitute_model_number"]=> string(0) "
         
-    public function get_table_data( $orderBy = NULL , $order, $offset, $limit ) {
+    public function get_table_data( $orderBy = NULL , $order, $offset, $limit , $filter ) {
+
         global $wpdb;
         $limit = ( $limit )? $limit: 10;
+       
         $sql = 'SELECT * FROM `'.$this->tableName.'`';
 
+        if( !empty( $filter) ){
+            $sql .= ' Where `model_id`  = ' . $filter;
+        }
         if(!empty($orderBy))
         {
             $sql .= ' ORDER BY ' . $orderBy;
@@ -76,7 +81,6 @@
         {
             $sql .= ' ' . $order;
         }
-
 
         if(!empty($limit))
         {

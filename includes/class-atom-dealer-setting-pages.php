@@ -88,10 +88,12 @@ class Atom_dealer_setting_pages extends Atom_List_Table
 	 */
 	public function atom_dealer_setting_model()
 	{
+		$table = 'main_model';
+		$limit = 10;
 		$table_view_options  = array( 'model_id','model_number','description','retail_price','date' );
-		$views = $this->list_views( $table_view_options  );
-		echo $views;
-		echo $this->pagination_( );
+
+		$view = $this->list_views( $table, $limit , $table_view_options );
+		echo '<div class="wrap">'.$view.'</div>';
 	
 	}
 
@@ -110,7 +112,7 @@ class Atom_dealer_setting_pages extends Atom_List_Table
 				<hr>
 			</header>
 
-			<?php $main_model = $this->get_main_model(); ?>
+			<?php //$main_model = $this->get_main_model(); ?>
 
 
 			<br />

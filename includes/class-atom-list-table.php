@@ -141,20 +141,20 @@ class Atom_List_Table {
 
     }
 
-    public function get_main_model()
+    public function get_main_model( $table , $limit , $filter )
 	{
 
-		$table    = new Dealer_Query('main_model');
+		$table    = new Dealer_Query( $table ); // ?? this could not pass the table name
 
         $pagenum = $this->get_pagenum();  // ?? does not work here
 
-		$total_item = $this->get_total_item_number();
+		$total_item = $this->get_total_item_number( $table );
 
         $limit = 10;
 
 		$offset = ( $pagenum - 1 ) * $limit;
-        //var_dump( $pagenum , $limit , $offset );
-		$all_rows = $table->get_table_data( 'date', 'DESC', $offset, $limit  );
+       
+		$all_rows = $table->get_table_data( 'date', 'DESC', $offset, $limit ,$filter );
 		return $all_rows;
 	}
 
@@ -164,17 +164,23 @@ class Atom_List_Table {
 	 *
 	 * @since 3.1.0
 	 */
-	public function list_views( $table_view_options ) {
+	public function list_views(  $table , $limit , $table_view_options  ) {
 
-       
+        $filter = empty( $_REQUEST['s'] ) ? '' : $_REQUEST['s'];
 
-        $data = $this->get_main_model(); 
+        $data = $this->get_main_model( $table , $limit ,$filter ); 
 
-       $views = '<form id="posts-filter" method="get">
+        $removable_query_args = wp_removable_query_args();
+
+        $current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+
+		$current_url = remove_query_arg( $removable_query_args, $current_url );
+
+       $views = '<form id="posts-filter" method="post" action="'.$current_url.'">
                 <header class="section-header">
-                    <h2>Model list</h2>
+                    <h2>Post list</h2>
                 </header>';
-            
+                $views .= $this->top_search_box( $table , $limit );
             
                 $views .= '<table class="wp-list-table widefat fixed striped table-view-list posts">';
 
@@ -186,6 +192,8 @@ class Atom_List_Table {
             
                 $views .= '</table></form>';
 
+                $views .= $this->pagination_( $table );
+
 		if ( empty( $views ) ) {
 			return;
 		}
@@ -193,6 +201,45 @@ class Atom_List_Table {
         return $views;
 
 	}
+
+    /**
+     * Undocumented function
+     *
+     * @return void
+     */
+    public function top_search_box( $table , $limit   ){
+       
+        if( empty( $_REQUEST['s'] ) &&  $this->get_total_item_number( $table) <= 0 ) {
+            return;
+        }
+
+        $text = empty( $_REQUEST['s'] ) ? '' : $_REQUEST['s'];
+       
+        if( !empty( $text ) ) {
+            echo '<span class="subtitle">Search results for: <strong>'.$text.'</strong></span>';
+        }
+
+        //echo '<input type="hidden" name="table" value="'.$table .'" />';
+
+        if( ! empty( $_REQUEST['orderby'] ) ) {
+            echo '<input type="hidden" name="orderby" value="'.esc_attr( $_REQUEST['orderby'] ).'" />';
+        }
+        if ( ! empty( $_REQUEST['order'] ) ) {
+			echo '<input type="hidden" name="order" value="' . esc_attr( $_REQUEST['order'] ) . '" />';
+		}
+        if ( ! empty( $_REQUEST['order'] ) ) {
+			echo '<input type="hidden" name="order" value="' . esc_attr( $_REQUEST['order'] ) . '" />';
+		}
+        
+        $search = '<p class="search-box">';
+            $search .= '<label class="screen-reader-text" for="'.esc_attr( $table ).'">'.$text.':</label>
+                        <input type="search" id="'.esc_attr( $table ).'" name="s" value="'._admin_search_query().'" />';
+             $search .= '<input type="submit" id="'.esc_attr( $table ).'-search-submit" class="button" value="Search">';
+            $search .= '</p><br/>';
+        return  $search;
+
+        
+    }
 
 
     /**
@@ -217,8 +264,8 @@ class Atom_List_Table {
 	}
 
 
-    public function get_total_item_number(){
-        $table    = new Dealer_Query('main_model');
+    public function get_total_item_number( $table ){
+        $table    = new Dealer_Query($table);
         $data = $table->get_all(); 
         $total_items     = ( count( $data ) )? count( $data ) : 0;
         return $total_items;
@@ -234,9 +281,9 @@ class Atom_List_Table {
 
 		$pagenum = isset( $_REQUEST['pagenum'] ) ? absint( $_REQUEST['pagenum'] ) : 0;
 
-		if ( ( $this->get_total_item_number() > 0  ) && $pagenum > $total_pages ) {
-			//$pagenum = $this->total_pages;
-		}
+		// if ( ( $this->get_total_item_number() > 0  ) && $pagenum > $total_pages ) {
+		// 	//$pagenum = $this->total_pages;
+		// }
 
 		return max( 1, $pagenum );
 	}
@@ -247,10 +294,10 @@ class Atom_List_Table {
         return $total_pages;
     }
 
-    protected function pagination_(  ) {
+    protected function pagination_( $table ) {
 
         $get_current_page =  $this->get_pagenum();
-        $get_total_item_number = $this->get_total_item_number();
+        $get_total_item_number = $this->get_total_item_number( $table );
         $total_pages = $this->get_pagination_data( $get_total_item_number , 10 );
 
         $page_links = paginate_links( array(
